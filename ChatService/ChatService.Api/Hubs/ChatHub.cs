@@ -18,19 +18,64 @@ namespace ChatService.Api.Hubs
 
         public async Task JoinRoom(string room)
         {
-            // Eğer oda listede yoksa, listeye ekle
             if (!_rooms.Contains(room))
             {
                 _rooms.Add(room);
             }
-            // Kullanıcıyı belirli bir odaya katılmak için gruba ekleyin
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
 
-            // Odaya katıldığını diğer kullanıcılara bildirmek için bir mesaj gönderebilirsiniz
+            // Odaya katıldığını diğer kullanıcılara bildir
             await Clients.Group(room).SendAsync("ReceiveMessage", $"{Context.ConnectionId} odaya katıldı: {room}");
 
             await Clients.Group("AdminGroup").SendAsync("ReceiveRoomList", _rooms);
 
+        }
+
+
+        public async Task JoinRoomFromUser(string roomName)
+        {
+            // oda var mı
+            var room = await _context.Rooms.SingleOrDefaultAsync(r => r.Name == roomName);
+
+            if (room == null)
+            {
+                room = new Room { Id = roomName, Name = roomName, CreatedAt = DateTime.UtcNow };
+                _context.Rooms.Add(room);
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Hata: {ex.Message}");
+                }
+            }
+
+            // Kullanıcıyı gruba ekle
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
+
+            // Odaya katıldığını diğer kullanıcılara bildir
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", $"{Context.ConnectionId} odaya katıldı: {roomName}");
+
+            // Adminlere oda listesini gönder bura yanlış ya 
+            var rooms = await _context.Rooms.Select(r => r.Name).ToListAsync();
+            await Clients.Group("AdminGroup").SendAsync("ReceiveRoomList", rooms);
+        }
+
+        private static readonly Dictionary<string, bool> _adminJoinedRooms = new Dictionary<string, bool>();
+
+        public async Task JoinRoomFromAdmin(string roomName)
+        {
+            // Adminin odaya daha önce katılıp katılmadığını kontrol et
+            if (_adminJoinedRooms.TryGetValue(roomName, out bool isAdminJoined) && isAdminJoined)
+            {
+                return;
+            }
+
+            _adminJoinedRooms[roomName] = true;
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", $"Admin odaya katıldı: {roomName}");
         }
 
         public async Task AddAdminToGroup()
@@ -43,14 +88,13 @@ namespace ChatService.Api.Hubs
 
 
 
-        public async Task SendMessage(string roomName, string user, string message)
+        public async Task SendMessage(string roomId, string user, string message)
         {
             try
             {
-                // Veritabanına mesajı önce kaydet
                 var chatMessage = new ChatMessage
                 {
-                    RoomName = roomName,
+                    RoomId = roomId,
                     UserName = user,
                     Message = message,
                     Timestamp = DateTime.Now
@@ -60,26 +104,33 @@ namespace ChatService.Api.Hubs
                 await _context.SaveChangesAsync();
 
                 // Mesajı sadece belirtilen odaya gönder
-                await Clients.Group(roomName).SendAsync("ReceiveMessage", user, message);
+                await Clients.Group(roomId).SendAsync("ReceiveMessage", user, message);
             }
             catch (Exception ex)
             {
-                // Hata yönetimi
                 Console.WriteLine($"Error occurred: {ex.Message}");
-                // İsteğe bağlı olarak hata loglama veya diğer işlemleri burada yapabilirsiniz.
             }
         }
 
-        public async Task LoadMessages(string roomName)
+        public async Task LoadMessages(string roomId)
         {
-            // Veritabanından mesaj geçmişini yükle
+            // zamana göre mesajları getir receiveMessages dinleyenlere gönder
             var messages = await _context.ChatMessages
-                .Where(m => m.RoomName == roomName)
+                .Where(m => m.RoomId == roomId)
                 .OrderBy(m => m.Timestamp) // Mesajları zaman damgasına göre sıralayın
                 .ToListAsync();
 
-            // Mesajları çağıran istemciye gönder
             await Clients.Caller.SendAsync("ReceiveMessages", messages);
+        }
+
+        public async Task LoadRooms()
+        {
+            //tarihe göre odaları getir ReceiveRooms dinleyenlere gönder
+            var rooms = await _context.Rooms
+                .OrderBy(r => r.CreatedAt).Select(r => r.Name)
+                .ToListAsync();
+
+            await Clients.Caller.SendAsync("ReceiveRooms", rooms);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

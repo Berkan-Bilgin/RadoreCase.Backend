@@ -34,9 +34,9 @@ namespace ChatService.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoomName")
+                    b.Property<string>("RoomId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
@@ -47,6 +47,8 @@ namespace ChatService.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RoomId");
+
                     b.ToTable("ChatMessages");
 
                     b.HasData(
@@ -54,18 +56,65 @@ namespace ChatService.Api.Migrations
                         {
                             Id = 1,
                             Message = "Hoş geldiniz! Burada her türlü soru ve sorunlarınızı paylaşabilirsiniz.",
-                            RoomName = "Room-1",
-                            Timestamp = new DateTime(2024, 8, 31, 17, 0, 34, 398, DateTimeKind.Local).AddTicks(6374),
+                            RoomId = "Room-User2",
+                            Timestamp = new DateTime(2024, 8, 31, 18, 11, 59, 889, DateTimeKind.Utc).AddTicks(1965),
                             UserName = "Admin"
                         },
                         new
                         {
                             Id = 2,
                             Message = "Teşekkürler! Bu gerçekten harika bir özellik.",
-                            RoomName = "Room-1",
-                            Timestamp = new DateTime(2024, 8, 31, 17, 0, 34, 398, DateTimeKind.Local).AddTicks(6384),
+                            RoomId = "Room-User2",
+                            Timestamp = new DateTime(2024, 8, 31, 18, 11, 59, 889, DateTimeKind.Utc).AddTicks(1967),
                             UserName = "User1"
                         });
+                });
+
+            modelBuilder.Entity("ChatService.Api.Models.Room", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rooms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "Room-User1",
+                            CreatedAt = new DateTime(2024, 8, 31, 18, 11, 59, 889, DateTimeKind.Utc).AddTicks(1827),
+                            Name = "Room-User1"
+                        },
+                        new
+                        {
+                            Id = "Room-User2",
+                            CreatedAt = new DateTime(2024, 8, 31, 18, 11, 59, 889, DateTimeKind.Utc).AddTicks(1830),
+                            Name = "Room-User2"
+                        });
+                });
+
+            modelBuilder.Entity("ChatService.Api.Models.ChatMessage", b =>
+                {
+                    b.HasOne("ChatService.Api.Models.Room", "Room")
+                        .WithMany("ChatMessages")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("ChatService.Api.Models.Room", b =>
+                {
+                    b.Navigation("ChatMessages");
                 });
 #pragma warning restore 612, 618
         }
