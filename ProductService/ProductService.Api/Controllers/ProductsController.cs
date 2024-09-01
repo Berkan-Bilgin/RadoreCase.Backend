@@ -52,15 +52,33 @@ namespace ProductService.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto productCreateDto)
+        public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto productCreateDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            string imgPath = null;
+
+            // Dosya yüklemesi yapılmış mı kontrol edelim
+            if (productCreateDto.Img != null)
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", productCreateDto.Img.FileName);
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await productCreateDto.Img.CopyToAsync(stream);
+                }
+
+                imgPath = $"/images/{productCreateDto.Img.FileName}";
+            }
+
             // DTO'yu entity'e dönüştür
             var product = _mapper.Map<Product>(productCreateDto);
+
+            // Dosya yolunu Product entity'sinin Img property'ine atıyoruz
+            product.Img = imgPath;
 
             // Veritabanına kaydet
             await _repository.AddAsync(product);
