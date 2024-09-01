@@ -28,7 +28,21 @@
           "Port": 5002
         }
       ]
+    },
+    {
+      "DownstreamPathTemplate": "/images/{file}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5003
+        }
+      ],
+      "UpstreamPathTemplate": "/images/{file}",
+      "UpstreamHttpMethod": [ "GET" ]
     }
+
+
   ]
 
 }
