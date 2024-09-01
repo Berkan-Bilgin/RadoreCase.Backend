@@ -55,7 +55,11 @@ namespace ChatService.Api.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
 
             // Odaya katıldığını diğer kullanıcılara bildir
-            await Clients.Group(roomName).SendAsync("ReceiveMessage", $"{Context.ConnectionId} odaya katıldı: {roomName}");
+            //await Clients.Group(roomName).SendAsync("ReceiveMessage", $"{Context.ConnectionId} odaya katıldı: {roomName}");
+
+
+            //uyarılar için ayrı bir mesaj türü belirtilebilir dinamik css için.
+            await Clients.Caller.SendAsync("ReceiveMessage", $"Merhaba {roomName}, Birazdan en yakın operatörü baglayacagız. ");
 
             // Adminlere oda listesini gönder bura yanlış ya 
             var rooms = await _context.Rooms.Select(r => r.Name).ToListAsync();
