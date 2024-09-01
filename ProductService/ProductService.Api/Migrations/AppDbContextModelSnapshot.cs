@@ -220,7 +220,7 @@ namespace ProductService.Api.Migrations
                             CategoryId = 1,
                             Description = "This is Product 1",
                             HoverImg = "hoverImg1.jpg",
-                            Img = "img1.jpg",
+                            Img = "/images/product1.png",
                             Price = 149.99m,
                             Title = "Product 1"
                         },
@@ -230,7 +230,7 @@ namespace ProductService.Api.Migrations
                             CategoryId = 2,
                             Description = "This is Product 2",
                             HoverImg = "hoverImg2.jpg",
-                            Img = "img2.jpg",
+                            Img = "/images/success-kid.png",
                             Price = 129.99m,
                             Title = "Product 2"
                         },
@@ -240,7 +240,7 @@ namespace ProductService.Api.Migrations
                             CategoryId = 3,
                             Description = "This is Product 3",
                             HoverImg = "hoverImg3.jpg",
-                            Img = "img3.jpg",
+                            Img = "/images/product2.png",
                             Price = 249.99m,
                             Title = "Product 3"
                         },
@@ -250,7 +250,7 @@ namespace ProductService.Api.Migrations
                             CategoryId = 4,
                             Description = "This is Product 4",
                             HoverImg = "hoverImg4.jpg",
-                            Img = "img4.jpg",
+                            Img = "/images/product3.png",
                             Price = 349.99m,
                             Title = "Product 4"
                         },
@@ -260,7 +260,7 @@ namespace ProductService.Api.Migrations
                             CategoryId = 5,
                             Description = "This is Product 5",
                             HoverImg = "hoverImg5.jpg",
-                            Img = "img5.jpg",
+                            Img = "/images/product4.png",
                             Price = 149.99m,
                             Title = "Product 5"
                         });

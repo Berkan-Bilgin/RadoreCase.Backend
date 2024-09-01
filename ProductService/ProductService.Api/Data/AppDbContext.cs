@@ -114,7 +114,7 @@ namespace ProductService.Api.Data
                     Id = 1,
                     CategoryId = 1,
                     Price = 149.99m,
-                    Img = "img1.jpg",
+                    Img = "/images/product1.png",
                     HoverImg = "hoverImg1.jpg",
                     Title = "Product 1",
                     Description = "This is Product 1"
@@ -124,7 +124,7 @@ namespace ProductService.Api.Data
                     Id = 2,
                     CategoryId = 2,
                     Price = 129.99m,
-                    Img = "img2.jpg",
+                    Img = "/images/success-kid.png",
                     HoverImg = "hoverImg2.jpg",
                     Title = "Product 2",
                     Description = "This is Product 2"
@@ -134,7 +134,7 @@ namespace ProductService.Api.Data
                     Id = 3,
                     CategoryId = 3,
                     Price = 249.99m,
-                    Img = "img3.jpg",
+                    Img = "/images/product2.png",
                     HoverImg = "hoverImg3.jpg",
                     Title = "Product 3",
                     Description = "This is Product 3"
@@ -144,7 +144,7 @@ namespace ProductService.Api.Data
                     Id = 4,
                     CategoryId = 4,
                     Price = 349.99m,
-                    Img = "img4.jpg",
+                    Img = "/images/product3.png",
                     HoverImg = "hoverImg4.jpg",
                     Title = "Product 4",
                     Description = "This is Product 4"
@@ -154,7 +154,7 @@ namespace ProductService.Api.Data
                     Id = 5,
                     CategoryId = 5,
                     Price = 149.99m,
-                    Img = "img5.jpg",
+                    Img = "/images/product4.png",
                     HoverImg = "hoverImg5.jpg",
                     Title = "Product 5",
                     Description = "This is Product 5"
